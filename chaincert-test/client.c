@@ -159,10 +159,6 @@ int main( int argc, char *argv[] )
         goto exit;
     }
 
-    /* OPTIONAL is usually a bad choice for security, but makes interop easier
-     * in this simplified example, in which the ca chain is hardcoded.
-     * Production code should set a proper ca chain and use REQUIRED. */
-    
     mbedtls_ssl_conf_authmode( &conf, MBEDTLS_SSL_VERIFY_REQUIRED );
 
     mbedtls_ssl_conf_rng( &conf, mbedtls_ctr_drbg_random, &ctr_drbg );
