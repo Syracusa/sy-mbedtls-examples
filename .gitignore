@@ -1,0 +1,12 @@
+build
+*.crt
+*.pem
+*.key
+
+index.txt
+serial
+crlnumber
+
+certs
+csr
+private
