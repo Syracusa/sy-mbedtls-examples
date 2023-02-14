@@ -23,8 +23,8 @@ endif()
 
 #============================================================
 
-add_executable(client "client.c" "sock.c" )
-add_executable(server "server.c" "sock.c" )
+add_executable(client "client.c" )
+add_executable(server "server.c" )
 
 #list(APPEND CMAKE_PREFIX_PATH "/usr/local/cmake")
 
