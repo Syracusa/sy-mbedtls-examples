@@ -94,14 +94,46 @@ int main(void)
      * server and CA certificates, as well as mbedtls_pk_parse_keyfile().
      */
 
-    ret = mbedtls_x509_crt_parse_file(&srvcert, "../../gencert/certs/server.cert.pem");
+
+    const char* servercertpath;
+    const char* serverpkeypath;
+    const char* cacertpath;
+
+    if (access("../../gencert/certs/server.cert.pem", F_OK) == 0){
+        servercertpath = "../../gencert/certs/server.cert.pem";
+    } else if (access("./server.cert.pem", F_OK) == 0) {
+        servercertpath = "./server.cert.pem";
+    } else {
+        fprintf(stderr, "No server cert found.\n");
+        goto exit;
+    }
+
+    if (access("../../gencert/certs/ca.cert.pem", F_OK) == 0){
+        cacertpath = "../../gencert/certs/ca.cert.pem";
+    } else if (access("./ca.cert.pem", F_OK) == 0) {
+        cacertpath = "./ca.cert.pem";
+    } else {
+        fprintf(stderr, "No ca cert found.\n");
+        goto exit;
+    }
+
+    if (access("../../gencert/private/server.pem", F_OK) == 0){
+        serverpkeypath ="../../gencert/private/server.pem";
+    } else if (access("./server.pem", F_OK) == 0) {
+        serverpkeypath = "./server.pem";
+    } else {
+        fprintf(stderr, "No server key found.\n");
+        goto exit;
+    }
+
+    ret = mbedtls_x509_crt_parse_file(&srvcert, servercertpath);
     if (ret != 0)
     {
         printf(" failed\n  !  mbedtls_x509_crt_parse returned %d\n\n", ret);
         goto exit;
     }
 
-    ret = mbedtls_x509_crt_parse_file(&srvcert, "../../gencert/certs/ca.cert.pem");
+    ret = mbedtls_x509_crt_parse_file(&srvcert,cacertpath);
     if (ret != 0)
     {
         printf(" failed\n  !  mbedtls_x509_crt_parse returned %d\n\n", ret);
@@ -109,7 +141,7 @@ int main(void)
     }
 
     ret = mbedtls_pk_parse_keyfile(&pkey,
-                                   "../../gencert/private/server.pem",
+                                   serverpkeypath,
                                    NULL,
                                    mbedtls_ctr_drbg_random,
                                    &ctr_drbg);

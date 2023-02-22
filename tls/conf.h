@@ -1,7 +1,12 @@
 #ifndef CONF_H
 #define CONF_H
 
+#include <unistd.h>
+
 #include "mbedtls/ssl_ciphersuites.h"
+
+#define SERVER_ADDR "192.168.1.111"
+// #define SERVER_ADDR "127.0.0.1"
 
 #define USE_CLIENT_AUTH 1
 #define USE_FORCED_CIPHER 1

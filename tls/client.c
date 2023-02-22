@@ -17,11 +17,10 @@ https://github.com/Mbed-TLS/mbedtls/blob/development/programs/ssl/dtls_client.c
 #define SERVER_PORT "4433"
 #define SERVER_NAME "Server"
 
-#define SERVER_ADDR "127.0.0.1"
 
 #define MESSAGE "Echo this"
 
-#define READ_TIMEOUT_MS 1000
+#define READ_TIMEOUT_MS 10000
 #define MAX_RETRY 5
 
 #define DEBUG_LEVEL 0
@@ -101,14 +100,46 @@ int main(int argc, char *argv[])
     fflush(stdout);
 
 #if USE_CLIENT_AUTH
-    ret = mbedtls_x509_crt_parse_file(&clicert, "../../gencert/certs/client.cert.pem");
+
+    const char *clientcertpath;
+    const char *clientpkeypath;
+    const char *cacertpath;
+
+    if (access("../../gencert/certs/client.cert.pem", F_OK) == 0){
+        clientcertpath = "../../gencert/certs/client.cert.pem";
+    } else if (access("./client.cert.pem", F_OK) == 0) {
+        clientcertpath = "./client.cert.pem";
+    } else {
+        fprintf(stderr, "No client cert found.\n");
+        goto exit;
+    }
+
+    if (access("../../gencert/certs/ca.cert.pem", F_OK) == 0){
+        cacertpath = "../../gencert/certs/ca.cert.pem";
+    } else if (access("./ca.cert.pem", F_OK) == 0) {
+        cacertpath = "./ca.cert.pem";
+    } else {
+        fprintf(stderr, "No ca cert found.\n");
+        goto exit;
+    }
+
+    if (access("../../gencert/private/client.pem", F_OK) == 0){
+        clientpkeypath ="../../gencert/private/client.pem";
+    } else if (access("./client.pem", F_OK) == 0) {
+        clientpkeypath = "./client.pem";
+    } else {
+        fprintf(stderr, "No client key found.\n");
+        goto exit;
+    }
+
+    ret = mbedtls_x509_crt_parse_file(&clicert, clientcertpath);
     if (ret != 0)
     {
         printf(" failed\n  !  mbedtls_x509_crt_parse returned %d\n\n", ret);
         goto exit;
     }
 
-    ret = mbedtls_x509_crt_parse_file(&clicert, "../../gencert/certs/ca.cert.pem");
+    ret = mbedtls_x509_crt_parse_file(&clicert, cacertpath);
     if (ret != 0)
     {
         printf(" failed\n  !  mbedtls_x509_crt_parse returned %d\n\n", ret);
@@ -116,7 +147,7 @@ int main(int argc, char *argv[])
     }
 
     ret = mbedtls_pk_parse_keyfile(&pkey,
-                                   "../../gencert/private/client.pem",
+                                   clientpkeypath,
                                    NULL,
                                    mbedtls_ctr_drbg_random,
                                    &ctr_drbg);
