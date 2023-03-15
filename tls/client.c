@@ -23,7 +23,7 @@ https://github.com/Mbed-TLS/mbedtls/blob/development/programs/ssl/dtls_client.c
 #define READ_TIMEOUT_MS 10000
 #define MAX_RETRY 5
 
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 4
 
 static void my_debug(void *ctx, int level,
                      const char *file, int line,
@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
     /*
      * 1. Start the connection
      */
-    printf("  . Connecting to udp/%s/%s...", SERVER_NAME, SERVER_PORT);
+    printf("  . Connecting to udp/%s/%s...", SERVER_ADDR, SERVER_PORT);
     fflush(stdout);
 
     if ((ret = mbedtls_net_connect(&server_fd, SERVER_ADDR,

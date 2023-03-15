@@ -20,7 +20,7 @@ https://github.com/Mbed-TLS/mbedtls/blob/development/programs/ssl/dtls_server.c
 #include "conf.h"
 
 #define READ_TIMEOUT_MS 10000 /* 10 seconds */
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 4
 
 static void my_debug(void *ctx, int level,
                      const char *file, int line,
@@ -156,10 +156,10 @@ int main(void)
     /*
      * 3. Setup the "listening" UDP socket
      */
-    printf("  . Bind on udp/*/4433 ...");
+    printf("  . Bind on udp/%s/4433 ...", SERVER_ADDR);
     fflush(stdout);
 
-    if ((ret = mbedtls_net_bind(&listen_fd, "127.0.0.1", "4433", MBEDTLS_NET_PROTO_UDP)) != 0)
+    if ((ret = mbedtls_net_bind(&listen_fd, SERVER_ADDR, "4433", MBEDTLS_NET_PROTO_UDP)) != 0)
     {
         printf(" failed\n  ! mbedtls_net_bind returned %d\n\n", ret);
         goto exit;
