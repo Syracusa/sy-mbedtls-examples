@@ -54,14 +54,23 @@ echo ''
 printf '\n\n\n\n\nServer\n\n\n\n' | \
 openssl req -new -sha256 -key private/server.pem -out csr/server.csr.pem
 
+echo ''
+echo '###############################'
+echo '#####   Check Server CSR  #####'
+echo '###############################'
+echo ''
+openssl req -in csr/server.csr.pem -text -noout
+
+
 # Generate Server Cert
 echo ''
 echo '################################'
 echo '##### Generate Server Cert #####'
 echo '################################'
 echo ''
-openssl x509 -req -in csr/server.csr.pem -CA certs/ca.cert.pem -CAkey private/cakey.pem -out certs/server.cert.pem -CAcreateserial -days 3650 -sha256
+openssl x509 -req -extfile <(printf "subjectAltName=IP:192.168.1.119") -in csr/server.csr.pem -CA certs/ca.cert.pem -CAkey private/cakey.pem -out certs/server.cert.pem -CAcreateserial -days 3650 -sha256
 # openssl ca -cert certs/ca-chain-bundle.cert.pem -in csr/server.csr.pem -out certs/server.cert.pem -days 3650 -config ica.cnf -extfile server.cnf
+# openssl ca -cert certs/ca.cert.pem -key private/cakey.pem -in csr/server.csr.pem -out certs/server.cert.pem -days 3650 -extensions 'subjectAltName = DNS:192.168.1.119'
 
 # Verify Server Cert
 echo ''
