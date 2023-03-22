@@ -68,7 +68,9 @@ echo '################################'
 echo '##### Generate Server Cert #####'
 echo '################################'
 echo ''
-openssl x509 -req -extfile <(printf "subjectAltName=IP:192.168.1.119") -in csr/server.csr.pem -CA certs/ca.cert.pem -CAkey private/cakey.pem -out certs/server.cert.pem -CAcreateserial -days 3650 -sha256
+
+openssl x509 -req -in csr/server.csr.pem -CA certs/ca.cert.pem -CAkey private/cakey.pem -out certs/server.cert.pem -CAcreateserial -days 3650 -sha256
+# openssl x509 -req -extfile <(printf "subjectAltName=IP:192.168.1.111") -in csr/server.csr.pem -CA certs/ca.cert.pem -CAkey private/cakey.pem -out certs/server.cert.pem -CAcreateserial -days 3650 -sha256
 # openssl ca -cert certs/ca-chain-bundle.cert.pem -in csr/server.csr.pem -out certs/server.cert.pem -days 3650 -config ica.cnf -extfile server.cnf
 # openssl ca -cert certs/ca.cert.pem -key private/cakey.pem -in csr/server.csr.pem -out certs/server.cert.pem -days 3650 -extensions 'subjectAltName = DNS:192.168.1.119'
 
