@@ -17,13 +17,12 @@ https://github.com/Mbed-TLS/mbedtls/blob/development/programs/ssl/dtls_client.c
 #define SERVER_PORT "4433"
 #define SERVER_NAME "Server"
 
-
 #define MESSAGE "Echo this"
 
 #define READ_TIMEOUT_MS 10000
 #define MAX_RETRY 5
 
-#define DEBUG_LEVEL 4
+#define DEBUG_LEVEL 0
 
 static void my_debug(void *ctx, int level,
                      const char *file, int line,
@@ -105,29 +104,44 @@ int main(int argc, char *argv[])
     const char *clientpkeypath;
     const char *cacertpath;
 
-    if (access("../../gencert/certs/client.cert.pem", F_OK) == 0){
+    if (access("../../gencert/certs/client.cert.pem", F_OK) == 0)
+    {
         clientcertpath = "../../gencert/certs/client.cert.pem";
-    } else if (access("./client.cert.pem", F_OK) == 0) {
+    }
+    else if (access("./client.cert.pem", F_OK) == 0)
+    {
         clientcertpath = "./client.cert.pem";
-    } else {
+    }
+    else
+    {
         fprintf(stderr, "No client cert found.\n");
         goto exit;
     }
 
-    if (access("../../gencert/certs/ca.cert.pem", F_OK) == 0){
+    if (access("../../gencert/certs/ca.cert.pem", F_OK) == 0)
+    {
         cacertpath = "../../gencert/certs/ca.cert.pem";
-    } else if (access("./ca.cert.pem", F_OK) == 0) {
+    }
+    else if (access("./ca.cert.pem", F_OK) == 0)
+    {
         cacertpath = "./ca.cert.pem";
-    } else {
+    }
+    else
+    {
         fprintf(stderr, "No ca cert found.\n");
         goto exit;
     }
 
-    if (access("../../gencert/private/client.pem", F_OK) == 0){
-        clientpkeypath ="../../gencert/private/client.pem";
-    } else if (access("./client.pem", F_OK) == 0) {
+    if (access("../../gencert/private/client.pem", F_OK) == 0)
+    {
+        clientpkeypath = "../../gencert/private/client.pem";
+    }
+    else if (access("./client.pem", F_OK) == 0)
+    {
         clientpkeypath = "./client.pem";
-    } else {
+    }
+    else
+    {
         fprintf(stderr, "No client key found.\n");
         goto exit;
     }
@@ -146,11 +160,35 @@ int main(int argc, char *argv[])
         goto exit;
     }
 
+#if USE_BUILTIN_KEY
+    printf("Use builtin key...\n");
+    ret = mbedtls_pk_setup_opaque(&pkey, BUILTIN_ECC_KEYPAIR_KEY_IDX);
+
+    if (ret == MBEDTLS_ERR_PK_BAD_INPUT_DATA)
+    {
+        fprintf(stderr, "MBEDTLS_ERR_PK_BAD_INPUT_DATA\n");
+    }
+    else if (ret == MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE)
+    {
+        fprintf(stderr, "MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE\n");
+    }
+    else if (ret == MBEDTLS_ERR_PK_ALLOC_FAILED)
+    {
+        fprintf(stderr, "MBEDTLS_ERR_PK_ALLOC_FAILED\n");
+    }
+    else
+    {
+        printf("mbedtls_pk_setup_opaque() success\n");
+    }
+
+#else
     ret = mbedtls_pk_parse_keyfile(&pkey,
                                    clientpkeypath,
                                    NULL,
                                    mbedtls_ctr_drbg_random,
                                    &ctr_drbg);
+#endif
+
 #else
     ret = mbedtls_x509_crt_parse_file(&cacert, "../../gencert/certs/ca.cert.pem");
     if (ret != 0)

@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "string.h": "c",
-        "ssl_cookie.h": "c"
+        "ssl_cookie.h": "c",
+        "timing.h": "c"
     }
 }

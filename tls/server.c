@@ -94,34 +94,48 @@ int main(void)
      * server and CA certificates, as well as mbedtls_pk_parse_keyfile().
      */
 
+    const char *servercertpath;
+    const char *serverpkeypath;
+    const char *cacertpath;
 
-    const char* servercertpath;
-    const char* serverpkeypath;
-    const char* cacertpath;
-
-    if (access("../../gencert/certs/server.cert.pem", F_OK) == 0){
+    if (access("../../gencert/certs/server.cert.pem", F_OK) == 0)
+    {
         servercertpath = "../../gencert/certs/server.cert.pem";
-    } else if (access("./server.cert.pem", F_OK) == 0) {
+    }
+    else if (access("./server.cert.pem", F_OK) == 0)
+    {
         servercertpath = "./server.cert.pem";
-    } else {
+    }
+    else
+    {
         fprintf(stderr, "No server cert found.\n");
         goto exit;
     }
 
-    if (access("../../gencert/certs/ca.cert.pem", F_OK) == 0){
+    if (access("../../gencert/certs/ca.cert.pem", F_OK) == 0)
+    {
         cacertpath = "../../gencert/certs/ca.cert.pem";
-    } else if (access("./ca.cert.pem", F_OK) == 0) {
+    }
+    else if (access("./ca.cert.pem", F_OK) == 0)
+    {
         cacertpath = "./ca.cert.pem";
-    } else {
+    }
+    else
+    {
         fprintf(stderr, "No ca cert found.\n");
         goto exit;
     }
 
-    if (access("../../gencert/private/server.pem", F_OK) == 0){
-        serverpkeypath ="../../gencert/private/server.pem";
-    } else if (access("./server.pem", F_OK) == 0) {
+    if (access("../../gencert/private/server.pem", F_OK) == 0)
+    {
+        serverpkeypath = "../../gencert/private/server.pem";
+    }
+    else if (access("./server.pem", F_OK) == 0)
+    {
         serverpkeypath = "./server.pem";
-    } else {
+    }
+    else
+    {
         fprintf(stderr, "No server key found.\n");
         goto exit;
     }
@@ -133,13 +147,35 @@ int main(void)
         goto exit;
     }
 
-    ret = mbedtls_x509_crt_parse_file(&srvcert,cacertpath);
+    ret = mbedtls_x509_crt_parse_file(&srvcert, cacertpath);
     if (ret != 0)
     {
         printf(" failed\n  !  mbedtls_x509_crt_parse returned %d\n\n", ret);
         goto exit;
     }
 
+#if USE_BUILTIN_KEY
+    printf("Use builtin key...\n");
+    ret = mbedtls_pk_setup_opaque(&pkey, BUILTIN_ECC_KEYPAIR_KEY_IDX);
+
+    if (ret == MBEDTLS_ERR_PK_BAD_INPUT_DATA)
+    {
+        fprintf(stderr, "MBEDTLS_ERR_PK_BAD_INPUT_DATA\n");
+    }
+    else if (ret == MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE)
+    {
+        fprintf(stderr, "MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE\n");
+    }
+    else if (ret == MBEDTLS_ERR_PK_ALLOC_FAILED)
+    {
+        fprintf(stderr, "MBEDTLS_ERR_PK_ALLOC_FAILED\n");
+    }
+    else
+    {
+        printf("mbedtls_pk_setup_opaque() success\n");
+    }
+
+#else
     ret = mbedtls_pk_parse_keyfile(&pkey,
                                    serverpkeypath,
                                    NULL,
@@ -150,7 +186,7 @@ int main(void)
         printf(" failed\n  !  mbedtls_pk_parse_key returned %d\n\n", ret);
         goto exit;
     }
-
+#endif
     printf(" ok\n");
 
     /*
