@@ -5,8 +5,7 @@
 
 #include "mbedtls/ssl_ciphersuites.h"
 
-#define SERVER_ADDR "192.168.1.104"
-// #define SERVER_ADDR "127.0.0.1"
+#define SERVER_ADDR "127.0.0.1"
 
 #define USE_CLIENT_AUTH 1
 #define USE_FORCED_CIPHER 1
